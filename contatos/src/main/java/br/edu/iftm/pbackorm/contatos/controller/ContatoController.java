@@ -1,5 +1,6 @@
 package br.edu.iftm.pbackorm.contatos.controller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.iftm.pbackorm.contatos.domain.Contato;
-import org.springframework.web.bind.annotation.RequestParam;
+import br.edu.iftm.pbackorm.contatos.dto.ErroDTO;
 
 
 
@@ -54,11 +56,18 @@ public class ContatoController {
     }
 
     @PostMapping
-    public ResponseEntity<Contato> novo(@RequestBody Contato contato) {
-        contatos.add(contato);
+    public ResponseEntity<?> novo(@RequestBody Contato novoContato) {
+        boolean existe = contatos.stream()
+                    .anyMatch(contato -> contato.getCodigo().equals(novoContato.getCodigo()));
+        if (existe) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(new ErroDTO("Já existe contato de código "+novoContato.getCodigo()
+                            ,LocalDateTime.now()));
+        }
+        contatos.add(novoContato);
         return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(contato);
+                    .body(novoContato);
     }
 
     @DeleteMapping("/{id}")
