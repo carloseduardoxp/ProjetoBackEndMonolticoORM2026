@@ -1,11 +1,13 @@
 package br.edu.iftm.pbackorm.contatos.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.iftm.pbackorm.contatos.domain.Contato;
@@ -31,23 +33,16 @@ public class ContatoController {
         }
         return ResponseEntity.notFound().build();        
     }
-/* 
+ 
     @GetMapping
     public ResponseEntity<List<Contato>> listar(
         @RequestParam(required = false) String nome) {
         if (nome == null) {
-            return ResponseEntity.ok(contatos);
+            return ResponseEntity.ok(repository.findAll());
         }
-        List<Contato> resposta = new ArrayList<>();
-        for (Contato contato: contatos) {
-            if (contato.getNome().toLowerCase()
-                .contains(nome.toLowerCase())) {
-                resposta.add(contato);
-            }
-        }
-        return ResponseEntity.ok(resposta);
+        return ResponseEntity.ok(repository.findByNomeContainingIgnoreCase(nome));
     }
-
+/* 
     @PostMapping
     public ResponseEntity<?> novo(@RequestBody Contato novoContato) {
         boolean existe = contatos.stream()
