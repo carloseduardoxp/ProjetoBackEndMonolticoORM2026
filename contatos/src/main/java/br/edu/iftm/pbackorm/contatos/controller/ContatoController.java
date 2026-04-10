@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.iftm.pbackorm.contatos.domain.Contato;
 import br.edu.iftm.pbackorm.contatos.repository.ContatoRepository;
+import jakarta.validation.Valid;
 
 
 
@@ -53,7 +54,7 @@ public class ContatoController {
     }
 
     @PostMapping
-    public ResponseEntity<Contato> novo(@RequestBody Contato novoContato) {
+    public ResponseEntity<Contato> novo(@Valid @RequestBody Contato novoContato) {
         Contato contato = repository.save(novoContato);
         return ResponseEntity
                     .status(HttpStatus.CREATED)
