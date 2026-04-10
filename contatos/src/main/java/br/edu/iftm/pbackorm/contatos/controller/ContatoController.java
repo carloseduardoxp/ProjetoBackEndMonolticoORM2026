@@ -35,12 +35,18 @@ public class ContatoController {
     }
  
     @GetMapping
-    public ResponseEntity<List<Contato>> listar(
-        @RequestParam(required = false) String nome) {
-        if (nome == null) {
-            return ResponseEntity.ok(repository.findAll());
-        }
-        return ResponseEntity.ok(repository.findByNomeContainingIgnoreCase(nome));
+    public List<Contato> listar(
+        @RequestParam(required = false) String nome,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) String telefone
+    ) {
+        nome = (nome == null) ? "" : nome;
+        email = (email == null) ? "" : email;
+        telefone = (telefone == null) ? "" : telefone;
+
+        return repository
+                .findByNomeContainingIgnoreCaseAndEmailContainingIgnoreCaseAndTelefoneContaining(
+                    nome, email, telefone);
     }
 /* 
     @PostMapping
