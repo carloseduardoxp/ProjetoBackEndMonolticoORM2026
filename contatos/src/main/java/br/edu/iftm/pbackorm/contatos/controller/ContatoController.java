@@ -1,13 +1,14 @@
 package br.edu.iftm.pbackorm.contatos.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.iftm.pbackorm.contatos.domain.Contato;
 import br.edu.iftm.pbackorm.contatos.repository.ContatoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 
@@ -31,11 +33,10 @@ public class ContatoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Contato> buscarPorId(@PathVariable Integer id) {
-        Optional<Contato> contatoOptional = repository.findById(id);
-        if (contatoOptional.isPresent()) {
-            return ResponseEntity.ok().body(contatoOptional.get());
-        }
-        return ResponseEntity.notFound().build();        
+        Contato contato = repository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException
+                                ("Contato de ID "+id+" não encontrado"));
+        return ResponseEntity.ok().body(contato);   
     }
  
     @GetMapping
@@ -60,35 +61,35 @@ public class ContatoController {
                     .status(HttpStatus.CREATED)
                     .body(contato);
     }
-/* 
+ 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Integer id,
-                                       @RequestBody Contato contatoAtualizado) {
-        for (Contato contato: contatos) {
-            if (contato.getCodigo().equals(id)) {
-                if (contatoAtualizado.getNome() == null || 
-                    contatoAtualizado.getNome().isBlank()) {
-                     return ResponseEntity.status(HttpStatus.BAD_REQUEST) 
-                        .body(new ErroDTO("Contato com nome vazio",LocalDateTime.now()));
-                }
-                contato.setNome(contatoAtualizado.getNome());
-                return ResponseEntity.ok(contatoAtualizado);
-            }
+    public ResponseEntity<Contato> atualizar(@PathVariable Integer id,
+                                       @Valid @RequestBody Contato contatoAtualizar) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Contato de ID "+id+" não encontrado");
         }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-            new ErroDTO("Contato não encontrado "+id,LocalDateTime.now()));
+        contatoAtualizar.setCodigo(id);
+        Contato contatoAtualizado = repository.save(contatoAtualizar);
+        return ResponseEntity.ok(contatoAtualizado);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Integer id) {
-        boolean removido = contatos.removeIf(
-            contato -> contato.getCodigo().equals(id));
-        if (removido) {
-            return ResponseEntity.noContent().build();
-        }    
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-            new ErroDTO("Contato não encontrado "+id, LocalDateTime.now()));
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        Contato contato = repository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException
+                                ("Contato de ID "+id+" não encontrado"));
+        repository.delete(contato);
+        return ResponseEntity.noContent().build();   
+    }
+ 
+    /* 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();   
     }
 */
 }
