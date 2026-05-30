@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.iftm.tspi.pbackorm.e_commerce.domain.Categoria;
 import br.edu.iftm.tspi.pbackorm.e_commerce.domain.Produto;
 import br.edu.iftm.tspi.pbackorm.e_commerce.dto.ProdutoDTO;
 import br.edu.iftm.tspi.pbackorm.e_commerce.dto.mapper.ProdutoMapper;
@@ -21,7 +21,6 @@ import br.edu.iftm.tspi.pbackorm.e_commerce.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
 
 
 
@@ -87,6 +86,24 @@ public class ProdutoController {
                                         ));
         repository.delete(produto);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("maior-preco-por-categoria")
+    public ResponseEntity<List<ProdutoDTO>> buscarProdutosComMaiorPrecoPorCategoria() {
+         List<ProdutoDTO> produtos = repository.buscarProdutosComMaiorPrecoPorCategoria();
+         if (produtos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+         }
+         return ResponseEntity.ok(produtos);
+    }
+
+    @GetMapping("maior-preco-por-categoria-nativo")
+    public ResponseEntity<List<ProdutoDTO>> buscarProdutosComMaiorPrecoPorCategoriaNativo() {
+         List<ProdutoDTO> produtos = repository.buscarProdutosComMaiorPrecoPorCategoriaNativo();
+         if (produtos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+         }
+         return ResponseEntity.ok(produtos);
     }
 
     
