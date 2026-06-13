@@ -1,5 +1,6 @@
 package br.edu.iftm.tspi.pbackorm.e_commerce.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.iftm.tspi.pbackorm.e_commerce.domain.Produto;
 import br.edu.iftm.tspi.pbackorm.e_commerce.dto.ProdutoDTO;
+import br.edu.iftm.tspi.pbackorm.e_commerce.dto.UnidadesCompradasDTO;
 import br.edu.iftm.tspi.pbackorm.e_commerce.dto.mapper.ProdutoMapper;
 import br.edu.iftm.tspi.pbackorm.e_commerce.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -97,14 +99,25 @@ public class ProdutoController {
          return ResponseEntity.ok(produtos);
     }
 
-    @GetMapping("maior-preco-por-categoria-nativo")
-    public ResponseEntity<List<ProdutoDTO>> buscarProdutosComMaiorPrecoPorCategoriaNativo() {
-         List<ProdutoDTO> produtos = repository.buscarProdutosComMaiorPrecoPorCategoriaNativo();
+    @GetMapping("maior-preco-por-categoria-nativo/{id}")
+    public ResponseEntity<List<ProdutoDTO>> buscarProdutosComMaiorPrecoPorCategoriaNativo
+                        (@PathVariable("id") Integer id) {
+         List<ProdutoDTO> produtos = repository.buscarProdutosComMaiorPrecoPorCategoriaNativo(id);
          if (produtos.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.notFound().build();
          }
          return ResponseEntity.ok(produtos);
     }
 
-    
+    @GetMapping("unidades-compradas-periodo")
+    public ResponseEntity<List<UnidadesCompradasDTO>> buscarUnidadesCompradasPeriodo
+                        (@RequestParam(required = true) LocalDate dataInicio,
+                         @RequestParam(required = true) LocalDate dataFim) {
+         List<UnidadesCompradasDTO> produtos = repository.findUnidadesCompradasPeriodo(dataInicio,dataFim);
+         if (produtos.isEmpty()) {
+            return ResponseEntity.notFound().build();
+         }
+         return ResponseEntity.ok(produtos);
+    }
+
 }
